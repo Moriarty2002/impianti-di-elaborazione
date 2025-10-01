@@ -3,7 +3,8 @@ import numpy as np
 
 
 PCA_COLS = ["Principale1", "Principale2", "Principale3", "Principale4"]
-UNUSED_COLS = ["Slab", "AnonPages", "Colonna 25", "Cluster"]
+UNUSED_COLS = ["AnonPages", "VmPTE", "Slab", "Colonna 25", "Cluster"]
+# currently made 14 cluster
 
 def variance_lost_after_pca(csv_path):
     """
@@ -63,7 +64,7 @@ def intracluster_variance(csv_path: str):
     # Get feature columns regarding clustering (all principal components)
     feature_cols = [col for col in df.columns if col in PCA_COLS]
     
-    results = {}
+    results = {"total": 0}
     for cluster, group in df.groupby("Cluster"):
         # Compute mean of the cluster
         mean_vector = group[feature_cols].mean().values
@@ -72,6 +73,7 @@ def intracluster_variance(csv_path: str):
         # Variance = average squared distance
         variance = np.mean(sq_dists)
         results[cluster] = variance
+        results["total"] += variance
     
     return results
 
@@ -79,13 +81,17 @@ def intracluster_variance(csv_path: str):
 if __name__ == "__main__":
     csv_file = "Q:\\Marcello\\University\\impianti\\impianti-di-elaborazione\\homework\\python\\deviance\\pca_clustering.csv"  
     
-    lost, retained = variance_lost_after_pca(csv_file)
+    pca_lost, pca_retained = variance_lost_after_pca(csv_file)
 
-    print(f"Variance retained: {retained*100:.2f}%")
-    print(f"Variance lost: {lost*100:.2f}%")
+    print(f"Variance retained: {pca_retained*100:.2f}%")
+    print(f"Variance lost: {pca_lost*100:.2f}%")
     
     
     variances = intracluster_variance(csv_file)
     print("Intra-cluster variances:")
     for cluster, var in variances.items():
         print(f"Cluster {cluster}: {var:.4f}")
+        
+    # Use the total value from the results dict
+    total_dev_lost = pca_lost + (variances["total"]/100) * pca_retained
+    print(f"Total deviance lost: {total_dev_lost}")
