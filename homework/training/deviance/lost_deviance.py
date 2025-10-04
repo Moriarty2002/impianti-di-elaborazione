@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 
@@ -72,14 +73,17 @@ def intracluster_variance(csv_path: str):
         sq_dists = np.sum((group[feature_cols].values - mean_vector) ** 2, axis=1)
         # Variance = average squared distance
         variance = np.mean(sq_dists)
-        results[cluster] = variance
+        results[str(cluster)] = variance
         results["total"] += variance
     
     return results
 
 
 if __name__ == "__main__":
-    csv_file = "Q:\\Marcello\\University\\impianti\\impianti-di-elaborazione\\homework\\python\\deviance\\pca_clustering.csv"  
+    # Get absolute path to the directory of this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    csv_file = os.path.join(script_dir, "pca_clustering.csv")
     
     pca_lost, pca_retained = variance_lost_after_pca(csv_file)
 
