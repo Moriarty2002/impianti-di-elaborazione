@@ -2,6 +2,7 @@ import pandas as pd
 import glob
 import os
 import matplotlib.pyplot as plt
+from common import plot_metrics
 
 def process_csv(file_path):
     # Read CSV file
@@ -72,58 +73,13 @@ def plot_grouped_summary(grouped_df, output_prefix="summary_plot"):
     x_for_max_power = grouped_df.loc[max_power_index, "prefix"]
 
     # --- Plot Average Response Time ---
-    plt.figure(figsize=(8, 5))
-    plt.plot(grouped_df["prefix"], grouped_df["avg_response_time_ms"], marker="o", linestyle="-", color="lightgreen")
-    plt.xlabel("Group Prefix")
-    plt.ylabel("Avg Response Time (ms)")
-    plt.title("Average Response Time per Group")
-    plt.grid(True, linestyle="--", alpha=0.6)
-    plt.xticks(grouped_df["prefix"])
-    plt.axvline(
-        x=x_for_max_power,
-        color='blue',
-        linestyle='--',
-        linewidth=0.9,
-    )
-    plt.tight_layout()
-    plt.savefig(f"{plot_dir}/{output_prefix}_avg_response_time.png")
-    plt.close()
+    plot_metrics(grouped_df, "avg_response_time_ms", plot_dir, f"{output_prefix}_avg_response_time", "CTT", "Avg [ms]", "Response Time", axvline_x=x_for_max_power)
 
     # --- Plot Throughput ---
-    plt.figure(figsize=(8, 5))
-    plt.plot(grouped_df["prefix"], grouped_df["throughput"], marker="o", linestyle="-", color="lightgreen")
-    plt.xlabel("Group Prefix")
-    plt.ylabel("Throughput (req/sec)")
-    plt.title("Throughput per Group")
-    plt.grid(True, linestyle="--", alpha=0.6)
-    plt.xticks(grouped_df["prefix"])
-    plt.axvline(
-        x=x_for_max_power,
-        color='blue',
-        linestyle='--',
-        linewidth=0.9,
-    )
-    plt.tight_layout()
-    plt.savefig(f"{plot_dir}/{output_prefix}_throughput.png")
-    plt.close()
+    plot_metrics(grouped_df, "throughput", plot_dir, f"{output_prefix}_throughput", "CTT", "Avg", "Throughput", axvline_x=x_for_max_power)
 
     # --- Plot Power ---
-    plt.figure(figsize=(8, 5))
-    plt.plot(grouped_df["prefix"], grouped_df["power"], marker="o", linestyle="-", color="lightgreen")
-    plt.xlabel("Group Prefix")
-    plt.ylabel("Power")
-    plt.title("Power per Group")
-    plt.grid(True, linestyle="--", alpha=0.6)
-    plt.xticks(grouped_df["prefix"])
-    plt.axvline(
-        x=x_for_max_power,
-        color='blue',
-        linestyle='--',
-        linewidth=0.9,
-    )
-    plt.tight_layout()
-    plt.savefig(f"{plot_dir}/{output_prefix}_power.png")
-    plt.close()
+    plot_metrics(grouped_df, "power", plot_dir, f"{output_prefix}_power", "CTT", "Avg", "Power", axvline_x=x_for_max_power)
 
     print(f"✅ Line plots saved as {output_prefix}_avg_response_time.png and {output_prefix}_throughput.png")
 
