@@ -10,6 +10,8 @@ def process_csv(file_path):
     # Total requests correctly served
     total_ok = df[df['responseMessage'] == "OK"].shape[0]
     total_nok = df[df['responseMessage'] != "OK"].shape[0]
+    
+    df = df[df["responseMessage"] == "OK"]
 
     duration = (df['timeStamp'].max() - df['timeStamp'].min()) / 1000
 
