@@ -64,15 +64,25 @@ def plot_grouped_summary(grouped_df, output_prefix="summary_plot"):
 
     # Sort by prefix
     grouped_df = grouped_df.sort_values("prefix")
+    
+    # Get x for knee capacity
+    max_power_index = grouped_df["power"].idxmax()
+    x_for_max_power = grouped_df.loc[max_power_index, "prefix"]
 
     # --- Plot Average Response Time ---
     plt.figure(figsize=(8, 5))
-    plt.plot(grouped_df["prefix"], grouped_df["avg_response_time_ms"], marker="o", linestyle="-", color="skyblue")
+    plt.plot(grouped_df["prefix"], grouped_df["avg_response_time_ms"], marker="o", linestyle="-", color="lightgreen")
     plt.xlabel("Group Prefix")
     plt.ylabel("Avg Response Time (ms)")
     plt.title("Average Response Time per Group")
     plt.grid(True, linestyle="--", alpha=0.6)
     plt.xticks(grouped_df["prefix"])
+    plt.axvline(
+        x=x_for_max_power,
+        color='blue',
+        linestyle='--',
+        linewidth=0.9,
+    )
     plt.tight_layout()
     plt.savefig(f"{plot_dir}/{output_prefix}_avg_response_time.png")
     plt.close()
@@ -85,6 +95,12 @@ def plot_grouped_summary(grouped_df, output_prefix="summary_plot"):
     plt.title("Throughput per Group")
     plt.grid(True, linestyle="--", alpha=0.6)
     plt.xticks(grouped_df["prefix"])
+    plt.axvline(
+        x=x_for_max_power,
+        color='blue',
+        linestyle='--',
+        linewidth=0.9,
+    )
     plt.tight_layout()
     plt.savefig(f"{plot_dir}/{output_prefix}_throughput.png")
     plt.close()
@@ -97,6 +113,12 @@ def plot_grouped_summary(grouped_df, output_prefix="summary_plot"):
     plt.title("Power per Group")
     plt.grid(True, linestyle="--", alpha=0.6)
     plt.xticks(grouped_df["prefix"])
+    plt.axvline(
+        x=x_for_max_power,
+        color='blue',
+        linestyle='--',
+        linewidth=0.9,
+    )
     plt.tight_layout()
     plt.savefig(f"{plot_dir}/{output_prefix}_power.png")
     plt.close()
