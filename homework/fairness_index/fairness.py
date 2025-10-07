@@ -26,7 +26,7 @@ def process_csv(file_path):
     }
 
 
-def process_summary(summary_file):
+def process_summary_avg(summary_file):
     df = pd.read_csv(summary_file)
 
     # get CTT value for grouping
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     results_df = pd.DataFrame(results)
     results_df.to_csv("homework/fairness_index/avg.csv", index=False)
     
-    process_summary(os.path.join(script_dir, "avg.csv"))
+    process_summary_avg(os.path.join(script_dir, "avg.csv"))
     
     compute_fairness_index(os.path.join(script_dir, "avg_grouped.csv"))
     
