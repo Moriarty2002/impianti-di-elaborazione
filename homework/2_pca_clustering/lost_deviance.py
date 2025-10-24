@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 
 
-PCA_COLS = ["Principale1", "Principale2", "Principale3", "Principale4"]
-UNUSED_COLS = ["AnonPages", "VmPTE", "Slab", "Colonna 25", "Cluster"]
+PCA_COLS = ["Principale1", "Principale2", "Principale3", "Principale4", "Principale5", "Principale6"]
+UNUSED_COLS = ["swpd", "si", "so", "st", "Cluster", "time"]
 # currently made 14 cluster
 
 def deviance_lost_after_pca(csv_path):
@@ -12,27 +12,27 @@ def deviance_lost_after_pca(csv_path):
     Returns:
         deviance_lost, deviance_retained
     """
-    df = pd.read_csv(csv_path, sep=r"[;,]", engine="python")
+    # Try to read CSV using comma as field separator and comma as decimal
+    # inside quoted numeric fields (European format). Use skipinitialspace
+    # to tolerate a space after delimiters.
+    df = pd.read_csv(csv_path, sep=',', quotechar='"', decimal=',', skipinitialspace=True, engine='c')
 
-    # Clean column names
+    # Clean column names (strip whitespace and remove stray apostrophes)
     df.columns = df.columns.str.strip().str.replace("'", "")
 
-    # Some CSVs (e.g. exported from JMP) use comma as decimal separator;
-    # quoted numeric fields like "2,3401579252" will be parsed as strings.
-    # Coerce known PCA columns to numeric by replacing decimal comma with dot.
+    # Ensure PCA columns are numeric; some imports may still produce strings
+    # (if quoting/decimal detection failed). Coerce explicitly as a fallback.
     for col in PCA_COLS:
-        if col in df.columns:
-            # remove surrounding quotes and stray apostrophes, strip spaces
+        if col in df.columns and not pd.api.types.is_numeric_dtype(df[col]):
+            # Remove surrounding quotes, convert decimal comma to dot and coerce
             s = df[col].astype(str).str.strip().str.replace('"', '').str.replace("'", "")
-            # replace decimal comma with dot — safe for JMP-style exports where
-            # the decimal separator is a comma inside quoted fields
-            s = s.str.replace(',', '.')
+            s = s.str.replace(',', '.', regex=False)
             df[col] = pd.to_numeric(s, errors='coerce')
 
-    # Select numeric columns
+    # Select numeric columns after coercion
     numeric_cols = df.select_dtypes(include=["number"]).columns
 
-    # Keep only valid ones
+    # Keep only valid PCA numeric ones
     pca_cols = [col for col in PCA_COLS if col in numeric_cols]
     print("PCA", pca_cols)
     
@@ -78,8 +78,9 @@ def intracluster_deviance(csv_path: str):
               "total" contains the sum of all cluster deviances.
     """
 
-    # Load dataset
-    df = pd.read_csv(csv_path, sep=r"[;,]", engine="python")  # handles commas or semicolons
+    # Load dataset. Expect comma-separated fields and comma decimal inside
+    # quoted numeric fields. Use skipinitialspace to tolerate spaces after commas.
+    df = pd.read_csv(csv_path, sep=',', quotechar='"', decimal=',', skipinitialspace=True, engine='c')
 
     # Ensure "Cluster" column exists
     if "Cluster" not in df.columns:
@@ -107,7 +108,7 @@ def intracluster_deviance(csv_path: str):
 if __name__ == "__main__":
     # Get absolute path to the directory of this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_file = os.path.join(script_dir, "pca_clustering.csv")
+    csv_file = os.path.join(script_dir, "test.csv")
 
     # Compute deviance lost/retained from PCA
     pca_lost, pca_retained = deviance_lost_after_pca(csv_file)
@@ -122,7 +123,7 @@ if __name__ == "__main__":
             print(f"Cluster {cluster}: {dev:.4f}")
 
     # Compute total PCA deviance (SST) to normalize intra-cluster total so units match.
-    df_main = pd.read_csv(csv_file, sep=r"[;,]", engine="python")
+    df_main = pd.read_csv(csv_file, sep=',', quotechar='"', decimal=',', skipinitialspace=True, engine='c')
     pca_feature_cols = [c for c in PCA_COLS if c in df_main.columns]
     total_pca_deviance = 0
     if pca_feature_cols:
