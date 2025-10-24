@@ -7,10 +7,10 @@ PCA_COLS = ["Principale1", "Principale2", "Principale3", "Principale4"]
 UNUSED_COLS = ["AnonPages", "VmPTE", "Slab", "Colonna 25", "Cluster"]
 # currently made 14 cluster
 
-def variance_lost_after_pca(csv_path):
+def deviance_lost_after_pca(csv_path):
     """
     Returns:
-        variance_lost, variance_retained
+        deviance_lost, deviance_retained
     """
     df = pd.read_csv(csv_path, sep=r"[;,]", engine="python")
 
@@ -34,68 +34,89 @@ def variance_lost_after_pca(csv_path):
 
     # --- Z-SCORE normalization on original features to correctly compare with principal components ---
     df_norm = df[original_cols].apply(lambda x: (x - x.mean()) / x.std(ddof=0))
-    
-    # Variance
-    var_original = df_norm.var(ddof=0).sum()
-    var_pca = df[pca_cols].var(ddof=0).sum()
 
-    variance_retained = var_pca / var_original
-    variance_lost = 1 - variance_retained
+    # Deviance = total sum of squared deviations (SST) across rows and features.
+    # Compute explicitly as sum((x - mean(x))**2) for clarity and to avoid
+    # relying on variance * n. This matches the definition of deviance (SST).
+    dev_original = ((df_norm - df_norm.mean()) ** 2).sum().sum()
 
-    return variance_lost, variance_retained
+    # For PCA components, compute SST from their means (not normalized here).
+    dev_pca = ((df[pca_cols] - df[pca_cols].mean()) ** 2).sum().sum()
+
+    if dev_original == 0:
+        raise ValueError("Original features have zero total deviance after normalization; cannot compute deviance ratio.")
+
+    deviance_retained = dev_pca / dev_original
+    deviance_lost = 1 - deviance_retained
+
+    return deviance_lost, deviance_retained
 
 
-def intracluster_variance(csv_path: str):
+def intracluster_deviance(csv_path: str):
     """
-    Calculates intra-cluster variance for each cluster in the dataset.
-    
+    Calculates intra-cluster deviance (sum of squared distances to the cluster mean)
+    for each cluster in the dataset. This returns per-cluster SST (sum of squared
+    deviations) and a `total` entry containing the sum across all clusters.
+
     Args:
         csv_path (str): Path to the CSV file
-    
+
     Returns:
-        dict: Mapping from cluster label to its variance value.
+        dict: Mapping from cluster label to its deviance (SST) value. The key
+              "total" contains the sum of all cluster deviances.
     """
+
     # Load dataset
     df = pd.read_csv(csv_path, sep=r"[;,]", engine="python")  # handles commas or semicolons
-    
-    # Ensure "CLUSTER" column exists
+
+    # Ensure "Cluster" column exists
     if "Cluster" not in df.columns:
-        raise ValueError("CSV must contain a 'CLUSTER' column.")
-    
+        raise ValueError("CSV must contain a 'Cluster' column.")
+
     # Get feature columns regarding clustering (all principal components)
     feature_cols = [col for col in df.columns if col in PCA_COLS]
-    
+    if not feature_cols:
+        raise ValueError(f"No PCA feature columns found in CSV. Expected one of: {PCA_COLS}")
+
     results = {"total": 0}
     for cluster, group in df.groupby("Cluster"):
-        # Compute mean of the cluster
+        # Compute mean vector of the cluster
         mean_vector = group[feature_cols].mean().values
-        # Compute squared distances to mean
+        # Compute squared distances to mean for each row
         sq_dists = np.sum((group[feature_cols].values - mean_vector) ** 2, axis=1)
-        # Variance = average squared distance
-        variance = np.mean(sq_dists)
-        results[str(cluster)] = variance
-        results["total"] += variance
-    
+        # Deviance (SST) for the cluster = sum of squared distances
+        deviance_cluster = np.sum(sq_dists)
+        results[str(cluster)] = deviance_cluster
+        results["total"] += deviance_cluster
+
     return results
 
 
 if __name__ == "__main__":
     # Get absolute path to the directory of this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    
     csv_file = os.path.join(script_dir, "pca_clustering.csv")
-    
-    pca_lost, pca_retained = variance_lost_after_pca(csv_file)
 
-    print(f"Variance retained: {pca_retained*100:.2f}%")
-    print(f"Variance lost: {pca_lost*100:.2f}%")
-    
-    
-    variances = intracluster_variance(csv_file)
-    print("Intra-cluster variances:")
-    for cluster, var in variances.items():
-        print(f"Cluster {cluster}: {var:.4f}")
-        
-    # Use the total value from the results dict
-    total_dev_lost = pca_lost + (variances["total"]/100) * pca_retained
-    print(f"Total deviance lost: {total_dev_lost}")
+    # Compute deviance lost/retained from PCA
+    pca_lost, pca_retained = deviance_lost_after_pca(csv_file)
+
+    print(f"Deviance retained: {pca_retained*100:.2f}%")
+    print(f"Deviance lost: {pca_lost*100:.2f}%")
+
+    deviances = intracluster_deviance(csv_file)
+    print("Intra-cluster deviances:")
+    for cluster, dev in deviances.items():
+        print(f"Cluster {cluster}: {dev:.4f}")
+
+    # Compute total PCA deviance (SST) to normalize intra-cluster total so units match.
+    df_main = pd.read_csv(csv_file, sep=r"[;,]", engine="python")
+    pca_feature_cols = [c for c in PCA_COLS if c in df_main.columns]
+    total_pca_deviance = 0
+    if pca_feature_cols:
+        total_pca_deviance = ((df_main[pca_feature_cols] - df_main[pca_feature_cols].mean()) ** 2).sum().sum()
+
+    intra_total = deviances.get("total", 0)
+    normalized_intra = (intra_total / total_pca_deviance) if total_pca_deviance > 0 else 0
+
+    total_dev_lost = pca_lost + normalized_intra * pca_retained
+    print(f"Total deviance lost (combined estimate): {total_dev_lost:.4f}")

@@ -1,0 +1,11 @@
+
+
+
+
+######### FASE 2: ANALISI JMP #########
+
+# Operazioni prefiltraggio
+
+prima riga scartata
+Controllo distribuzioni colonne, rimosse:
+swpd, si, so, st (e time ovviamente)
