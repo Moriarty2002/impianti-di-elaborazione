@@ -9,3 +9,8 @@
 prima riga scartata
 Controllo distribuzioni colonne, rimosse:
 swpd, si, so, st (e time ovviamente)
+
+
+Combinazioni:
+    PCA: 2, 3, 5, 6
+    cluster: 33, 20, 13, 8

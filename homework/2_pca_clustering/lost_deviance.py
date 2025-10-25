@@ -1,11 +1,11 @@
 import os
+import re
 import pandas as pd
 import numpy as np
 
 
 PCA_COLS = ["Principale1", "Principale2", "Principale3", "Principale4", "Principale5", "Principale6"]
 UNUSED_COLS = ["swpd", "si", "so", "st", "Cluster", "time"]
-# currently made 14 cluster
 
 def deviance_lost_after_pca(csv_path):
     """
@@ -16,6 +16,12 @@ def deviance_lost_after_pca(csv_path):
     # inside quoted numeric fields (European format). Use skipinitialspace
     # to tolerate a space after delimiters.
     df = pd.read_csv(csv_path, sep=',', quotechar='"', decimal=',', skipinitialspace=True, engine='c')
+
+    # If a Cluster column exists, drop rows without a cluster (NaN or empty string)
+    if 'Cluster' in df.columns:
+        df = df[df['Cluster'].notna() & (df['Cluster'].astype(str).str.strip() != '')]
+        if df.empty:
+            raise ValueError("No rows with a valid 'Cluster' found after filtering.")
 
     # Clean column names (strip whitespace and remove stray apostrophes)
     df.columns = df.columns.str.strip().str.replace("'", "")
@@ -86,6 +92,11 @@ def intracluster_deviance(csv_path: str):
     if "Cluster" not in df.columns:
         raise ValueError("CSV must contain a 'Cluster' column.")
 
+    # Drop rows without a cluster (NaN or empty string)
+    df = df[df['Cluster'].notna() & (df['Cluster'].astype(str).str.strip() != '')]
+    if df.empty:
+        raise ValueError("No rows with a valid 'Cluster' found after filtering.")
+
     # Get feature columns regarding clustering (all principal components)
     feature_cols = [col for col in df.columns if col in PCA_COLS]
     if not feature_cols:
@@ -108,29 +119,102 @@ def intracluster_deviance(csv_path: str):
 if __name__ == "__main__":
     # Get absolute path to the directory of this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_file = os.path.join(script_dir, "test.csv")
 
-    # Compute deviance lost/retained from PCA
-    pca_lost, pca_retained = deviance_lost_after_pca(csv_file)
+    # Folder with CSVs to process (one or many). If the folder does not exist
+    # the script will fallback to processing a single `test.csv` in the same dir.
+    csv_folder = os.path.join(script_dir, "csv")
+    fallback_csv = os.path.join(script_dir, "test.csv")
 
-    print(f"Deviance retained: {pca_retained*100:.2f}%")
-    print(f"Deviance lost: {pca_lost*100:.2f}%")
+    # Output summary file (appended rows for each processed CSV file)
+    results_file = os.path.join(script_dir, "results_summary.csv")
 
-    deviances = intracluster_deviance(csv_file)
-    print("Intra-cluster deviances:")
-    for cluster, dev in deviances.items(): #print only 'total' column
-        if cluster == "total":
-            print(f"Cluster {cluster}: {dev:.4f}")
+    # Columns: filename, deviance_retained, deviance_lost, intra_cluster_total, total_dev_lost, error
+    processed_any = False
 
-    # Compute total PCA deviance (SST) to normalize intra-cluster total so units match.
-    df_main = pd.read_csv(csv_file, sep=',', quotechar='"', decimal=',', skipinitialspace=True, engine='c')
-    pca_feature_cols = [c for c in PCA_COLS if c in df_main.columns]
-    total_pca_deviance = 0
-    if pca_feature_cols:
-        total_pca_deviance = ((df_main[pca_feature_cols] - df_main[pca_feature_cols].mean()) ** 2).sum().sum()
+    if os.path.isdir(csv_folder):
+        csv_files = [os.path.join(csv_folder, f) for f in sorted(os.listdir(csv_folder)) if f.lower().endswith('.csv')]
+    else:
+        csv_files = []
 
-    intra_total = deviances.get("total", 0)
-    normalized_intra = (intra_total / total_pca_deviance) if total_pca_deviance > 0 else 0
+    # Fallback to single test.csv if no files found
+    if not csv_files and os.path.exists(fallback_csv):
+        csv_files = [fallback_csv]
 
-    total_dev_lost = pca_lost + normalized_intra * pca_retained
-    print(f"Total deviance lost: {total_dev_lost:.4f}")
+    if not csv_files:
+        print(f"No CSV files found in '{csv_folder}' and no fallback '{fallback_csv}' present. Nothing to do.")
+    else:
+        for csv_file in csv_files:
+            processed_any = True
+            error_msg = ""
+            try:
+                pca_lost, pca_retained = deviance_lost_after_pca(csv_file)
+            except Exception as e:
+                pca_lost = float('nan')
+                pca_retained = float('nan')
+                error_msg = f"deviance_lost_after_pca error: {e}"
+
+            try:
+                deviances = intracluster_deviance(csv_file)
+                intra_total = deviances.get("total", 0)
+            except Exception as e:
+                intra_total = float('nan')
+                error_msg = (error_msg + "; " if error_msg else "") + f"intracluster_deviance error: {e}"
+
+            # Compute total PCA deviance to normalize intracluster total (matching previous logic)
+            total_pca_deviance = 0
+            try:
+                df_main = pd.read_csv(csv_file, sep=',', quotechar='"', decimal=',', skipinitialspace=True, engine='c')
+                # If a Cluster column exists, drop rows without a cluster
+                if 'Cluster' in df_main.columns:
+                    df_main = df_main[df_main['Cluster'].notna() & (df_main['Cluster'].astype(str).str.strip() != '')]
+                    if df_main.empty:
+                        # No valid rows left; treat as an error for downstream steps
+                        raise ValueError("No rows with a valid 'Cluster' found after filtering in main read.")
+                pca_feature_cols = [c for c in PCA_COLS if c in df_main.columns]
+                if pca_feature_cols:
+                    total_pca_deviance = ((df_main[pca_feature_cols] - df_main[pca_feature_cols].mean()) ** 2).sum().sum()
+            except Exception as e:
+                total_pca_deviance = 0
+                error_msg = (error_msg + "; " if error_msg else "") + f"read_main error: {e}"
+
+            normalized_intra = (intra_total / total_pca_deviance) if (total_pca_deviance and not np.isnan(intra_total)) else 0
+
+            total_dev_lost = float('nan')
+            try:
+                if not np.isnan(pca_lost) and not np.isnan(pca_retained):
+                    total_dev_lost = pca_lost + normalized_intra * pca_retained
+            except Exception:
+                total_dev_lost = float('nan')
+
+            # Parse PCA and Cluster counts from filename like '6_componenti_13_cluster.csv'
+            base = os.path.basename(csv_file)
+            m = re.search(r"(\d+)_componenti_(\d+)_cluster", base)
+            if m:
+                pca_count = int(m.group(1))
+                cluster_count = int(m.group(2))
+            else:
+                # If parsing fails, set NaN and record original filename in error
+                pca_count = float('nan')
+                cluster_count = float('nan')
+                error_msg = (error_msg + "; " if error_msg else "") + f"filename parse error: {base}"
+
+            # Prepare row and append to results CSV. Replace 'filename' with PCA and Cluster numeric columns.
+            row = {
+                'PCA': pca_count,
+                'Cluster': cluster_count,
+                'deviance_retained': pca_retained,
+                'deviance_lost': pca_lost,
+                'intra_cluster_total': intra_total,
+                'total_dev_lost': total_dev_lost,
+                'error': error_msg
+            }
+
+            # Write/appended the row
+            df_row = pd.DataFrame([row])
+            header = not os.path.exists(results_file)
+            df_row.to_csv(results_file, mode='a', header=header, index=False, float_format='%.6f')
+
+            print(f"Processed: {os.path.basename(csv_file)} -> retained={pca_retained:.6f}, lost={pca_lost:.6f}, intra_total={intra_total}, total_dev_lost={total_dev_lost:.6f}")
+
+        if processed_any:
+            print(f"Appended results to: {results_file}")
