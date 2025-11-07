@@ -1,0 +1,14 @@
+# HL workload info
+
+Before PCA + Clustering:
+    removed responseCode, responeMessage, threadName, dataType, success, failureMessage, URL
+    removed first row (ordered by Timestamp)
+
+After distribution analysis:
+    removed allThread (equal to grpThreads), idleTime (constant)
+
+After PCA:
+    choosed 5 PC
+
+After Clustering:
+    choosed 8 cluster
