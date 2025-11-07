@@ -1,11 +1,10 @@
 import os
-import re
 import pandas as pd
 import numpy as np
 
 
-PCA_COLS = ["Principale1", "Principale2", "Principale3", "Principale4", "Principale5", "Principale6"]
-UNUSED_COLS = ["responseCode", "responseMessage", "threadName", "dataType", "success", "failureMessage", "URL", "Cluster"]
+PCA_COLS = ["Principale1", "Principale2", "Principale3", "Principale4", "Principale5"]
+UNUSED_COLS = ["responseCode", "responseMessage", "threadName", "dataType", "success", "failureMessage", "URL", "timeStamp", "label", "Cluster"]
 
 def deviance_lost_after_pca(csv_path):
     """
@@ -188,20 +187,11 @@ if __name__ == "__main__":
 
             # Parse PCA and Cluster counts from filename like '6_componenti_13_cluster.csv'
             base = os.path.basename(csv_file)
-            m = re.search(r"(\d+)_componenti_(\d+)_cluster", base)
-            if m:
-                pca_count = int(m.group(1))
-                cluster_count = int(m.group(2))
-            else:
-                # If parsing fails, set NaN and record original filename in error
-                pca_count = float('nan')
-                cluster_count = float('nan')
-                error_msg = (error_msg + "; " if error_msg else "") + f"filename parse error: {base}"
 
-            # Prepare row and append to results CSV. Replace 'filename' with PCA and Cluster numeric columns.
+
+            # Prepare row and append to results CSV. Include original filename to make debugging easier.
             row = {
-                'PCA': pca_count,
-                'Cluster': cluster_count,
+                'filename': base,
                 'deviance_retained': pca_retained,
                 'deviance_lost': pca_lost,
                 'intra_cluster_total': intra_total,

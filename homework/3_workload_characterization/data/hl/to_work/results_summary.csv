@@ -1,0 +1,2 @@
+filename,deviance_retained,deviance_lost,intra_cluster_total,total_dev_lost,error
+hl_pca_clustering.csv,0.972882,0.027118,17659.896286,0.243713,

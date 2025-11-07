@@ -11,4 +11,4 @@ After PCA:
     choosed 5 PC
 
 After Clustering:
-    choosed 8 cluster
+    choosed 10 cluster
