@@ -104,11 +104,11 @@
           <stringProp name="filename">/shared/University/impianti/impianti-di-elaborazione/homework/workload_characterization/data/hl/900_1.csv</stringProp>
         </ResultCollector>
         <hashTree/>
-        <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Controller" enabled="true">
+        <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Controller">
           <intProp name="InterleaveControl.style">1</intProp>
         </RandomController>
         <hashTree>
-          <ConstantThroughputTimer guiclass="TestBeanGUI" testclass="ConstantThroughputTimer" testname="Constant Throughput Timer" enabled="true">
+          <ConstantThroughputTimer guiclass="TestBeanGUI" testclass="ConstantThroughputTimer" testname="Constant Throughput Timer">
             <doubleProp>
               <name>throughput</name>
               <value>900.0</value>
@@ -218,7 +218,7 @@
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group 700">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group 700" enabled="true">
         <intProp name="ThreadGroup.num_threads">30</intProp>
         <intProp name="ThreadGroup.ramp_time">15</intProp>
         <longProp name="ThreadGroup.duration">300</longProp>
@@ -268,11 +268,11 @@
           <stringProp name="filename">/shared/University/impianti/impianti-di-elaborazione/homework/workload_characterization/data/hl/700_1.csv</stringProp>
         </ResultCollector>
         <hashTree/>
-        <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Controller" enabled="true">
+        <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Controller">
           <intProp name="InterleaveControl.style">1</intProp>
         </RandomController>
         <hashTree>
-          <ConstantThroughputTimer guiclass="TestBeanGUI" testclass="ConstantThroughputTimer" testname="Constant Throughput Timer" enabled="true">
+          <ConstantThroughputTimer guiclass="TestBeanGUI" testclass="ConstantThroughputTimer" testname="Constant Throughput Timer">
             <doubleProp>
               <name>throughput</name>
               <value>700.0</value>
@@ -425,7 +425,7 @@
           <intProp name="InterleaveControl.style">1</intProp>
         </RandomController>
         <hashTree>
-          <ConstantThroughputTimer guiclass="TestBeanGUI" testclass="ConstantThroughputTimer" testname="Constant Throughput Timer" enabled="true">
+          <ConstantThroughputTimer guiclass="TestBeanGUI" testclass="ConstantThroughputTimer" testname="Constant Throughput Timer">
             <doubleProp>
               <name>throughput</name>
               <value>1100.0</value>
