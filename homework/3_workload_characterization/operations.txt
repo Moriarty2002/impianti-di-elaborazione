@@ -1,3 +1,5 @@
+####### STEP 1 #######
+
 # HL workload info
 
 Before PCA + Clustering:
@@ -27,6 +29,21 @@ After PCA:
 After Clustering:
     choosed 14 cluster
 
-
 To characterize:
     just take one random sample for every cluster
+
+
+
+####### STEP 2 #######
+
+# HL syntetic
+take the request with highest number for every cluster
+- Cluster 1: HTTP medium_9
+- Cluster 2: HTTP light_8
+- Cluster 3: HTTP heavy_5
+- Cluster 5: HTTP medium_6
+- Cluster 6: HTTP medium_10
+- Cluster 7: HTTP light_3
+- Cluster 8: HTTP heavy_4
+- Cluster 9: HTTP heavy_2
+- Cluster 10: HTTP medium_4
