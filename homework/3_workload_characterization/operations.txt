@@ -12,3 +12,21 @@ After PCA:
 
 After Clustering:
     choosed 10 cluster
+
+
+# LL data
+Before PCA + Clustering:
+    removed first row
+
+After distribution analysis:
+    removed swpd, si, so, st, gu
+
+After PCA:
+    choosed 8 PC
+
+After Clustering:
+    choosed 14 cluster
+
+
+To characterize:
+    just take one random sample for every cluster
