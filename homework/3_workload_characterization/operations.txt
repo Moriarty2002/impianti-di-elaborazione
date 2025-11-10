@@ -48,3 +48,27 @@ take the request with highest number for every cluster
 - Cluster 8: HTTP heavy_4
 - Cluster 9: HTTP heavy_3 (to use th group 2)
 - Cluster 10: HTTP medium_7
+
+
+####### STEP 3 #######
+
+# Manipulate LLc (syntetic low level pca clustering)
+note: 'wa' field has 0 deviation
+applied same pca and clustering rules
+
+took random sample (row) for every cluster
+
+
+
+####### STEP 4 #######
+## check if ll_subsed and ll_syntetic_subset are equivalent
+
+follow the steps in the homework assignment pdf
+used matlab script
+USED alpha = 0.01
+
+in our case data:
+    not normally distrubuted (check both visually and ks test)
+        unpaired observations:
+            Wilcoxon rank-sum test on every column gives 0 
+            (data from real and syntetic ll come from continuous distribution with equal medians)
