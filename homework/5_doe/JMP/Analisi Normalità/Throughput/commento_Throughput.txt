@@ -1,0 +1,3 @@
+Valutazione della normalità – Residuo Throughput:
+
+L’ispezione visiva del QQ-plot mostra che i punti si discostano in modo evidente dalla linea di riferimento, soprattutto nelle code, e ricadono al di fuori delle bande di confidenza. Questo comportamento indica che la distribuzione dei residui del Throughput non segue una distribuzione normale. Anche l’istogramma conferma asimmetria e presenza di outlier, suggerendo ulteriori violazioni dell’ipotesi di normalità.

@@ -1,0 +1,6 @@
+In una distribuzione normale, i puntini neri dovrebbero seguire fedelmente la linea rossa diagonale retta e rimanere all'interno delle linee tratteggiate (bande di confidenza).
+
+Nel tuo grafico, i punti formano una curva a "S" e si allontanano drasticamente dalla linea rossa alle due estremità (code).
+
+Inoltre, il Box Plot (al centro) mostra diversi puntini neri fuori dai "baffi", il che indica la presenza di outliers (valori anomali) sia in alto che in basso.
+
