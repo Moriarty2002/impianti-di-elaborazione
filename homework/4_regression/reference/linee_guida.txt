@@ -1,0 +1,11 @@
+REGRESSIONE: 
+- Stima lineare della variabile sui predittori per capire se c'è una relazione lineare fra i dati
+- Normalità dei residui tramite test visivo qqplot e test di KSL (bontà di adattemento legacy)
+- Omoschedasticità dei residui con test visivo
+
+Abbiamo tre casi:
+1) Se sono soddisfatte tutte le condizioni allora facciamo una stima ai minimi quadrati
+2) Se è soddisfatta solo la normalità allora test di Welch
+3) Altrimenti abbiamo il test di Mann-Kendall che è un test non parametrico per capire se una serie temporale ha un trend monotono crescente o decrescente (a patto di assenza di autocorrelazione dei dati)
+
+Negli ultimi due casi facciamo una stima con la procedura di Theil-Sen calcolare i parametri di regressione
