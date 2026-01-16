@@ -1,0 +1,4 @@
+Sheet,Slope,Interval_Low,Interval_Up,Intercept,Trend,Time_seconds,Time_years,Uncertainty_years
+VMres1,0.691122,0.563777,0.817824,6562275.46,↗ Crescente,1544125097,48.93,9.32
+VMres2,0.670950,0.604864,0.736654,5780180.56,↗ Crescente,1591715857,50.44,5.00
+VMres3,2.903093,2.714760,3.092353,6041585.56,↗ Crescente,367780204,11.65,0.76

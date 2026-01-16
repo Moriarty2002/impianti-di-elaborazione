@@ -3,7 +3,7 @@ REGRESSIONE
 ****************************************************************** EXP ************************************
 ******** EXP1 *********
 Seguiti step del file readme, nel test della normalità dati, visivamente si vede che non lo sono e
-	inoltre test Shapiro-Wilk W (bontà di adattamento, goodness of fit) ci dà p-value << 0.05 
+	inoltre test Anderson-Darling (utilizzato al posto di Sapiro-Wilk quando >2k record) (bontà di adattamento, goodness of fit) ci dà p-value << 0.05 
 
 Valutato se esiste trend con test di Man-Kendall: solo byte sent lo ha
 
@@ -24,7 +24,7 @@ Calcolo slope con theil-san, solo nmail ha 0 nell'intervallo, quindi è come se 
 ****************************************************************** OS ************************************
 ******** OS1 *********
 Seguiti step del file readme, nel test della normalità dati, visivamente si vede che non lo sono e
-	inoltre test Shapiro-Wilk W (bontà di adattamento, goodness of fit) ci dà p-value << 0.05 
+	inoltre test Anderson-Darling (bontà di adattamento, goodness of fit) ci dà p-value << 0.05 
 
 Valutato se esiste trend con test di Man-Kendall:
 
@@ -52,5 +52,16 @@ byte_scritti: os2 e os3 hanno trend decrescenti, os1 non presente
 
 
 
+Tutti e 3 hanno residui non normali e hanno p-value molto basso nel test di Mann-Kendall (trend esistente)
 
+quindi calcolo parametri con Theil-Sen ed effettuo la prediction dell'istante t di saturazione con 1GB max
 
+Dataset	Slope (byte/s)	Tempo saturazione	Trend
+VMres3	2.903		11.7 ± 0.8 anni		⚡ PIÙ VELOCE
+VMres1	0.691		48.9 ± 9.3 anni		Medio
+VMres2	0.671		50.4 ± 5.0 anni		🐌 PIÙ LENTO
+
+Conclusioni:
+VMres3 è 4.2× più veloce di VMres1/VMres2 nel consumare heap
+La differenza tra il più veloce e il più lento è di 38.8 anni
+Tutti mostrano trend crescente significativo
