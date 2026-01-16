@@ -1,0 +1,7 @@
+Sheet,Variable,Slope,Interval_Low,Interval_Up,Intercept,Trend
+EXP1,nmail,0.000000,0.000000,0.000000,297.00,⚠️ Non significativo
+EXP1,byte rec,-12.876245,-27.426881,1.691755,10411056.14,⚠️ Non significativo
+EXP1,byte sent,-9.667414,-18.762445,-0.516735,9954543.87,↘ Decrescente
+EXP2,nmail,-0.000597,-0.001125,0.000000,592.39,⚠️ Non significativo
+EXP2,byte rec,-48.293610,-77.547733,-18.993147,20890131.99,↘ Decrescente
+EXP2,byte sent,-34.063052,-50.672673,-17.374088,19903064.10,↘ Decrescente

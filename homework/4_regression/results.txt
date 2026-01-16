@@ -1,0 +1,20 @@
+REGRESSIONE
+
+******** EXP1 *********
+Seguiti step del file readme, nel test della normalità dati, visivamente si vede che non lo sono e
+	inoltre test Shapiro-Wilk W (bontà di adattamento, goodness of fit) ci dà p-value << 0.05 
+
+Valutato se esiste trend con test di Man-Kendall: solo byte sent lo ha
+
+Calcolo slope con theil-san, solo byte sent non ha 0 nell'intervallo
+
+
+******** EXP2 *********
+Seguiti step del file readme, nel test della normalità dati, visivamente si vede che non lo sono e
+	inoltre test Shapiro-Wilk W (bontà di adattamento, goodness of fit) ci dà p-value << 0.05 
+
+
+Valutato se esiste trend con test di Man-Kendall: lo hanno tutti, ma nmail ha p-value molto vicino a 0.05
+
+Calcolo slope con theil-san, solo nmail ha 0 nell'intervallo, quindi è come se ci fosse un trend decrescente molto basso dato
+	il risultato del test di Mann-Kendall
