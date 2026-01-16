@@ -1,0 +1,16 @@
+Sheet,Metric,MK_Tau,MK_p-value,MK_Signif,TS_Slope,TS_Interval,TS_Signif,Coherence,Note
+os1,LIN1_VmSize,0.807648,0.000000,SÌ,0.031572,"[0.030716, 0.032321]",SÌ,✓ COERENTI,Entrambi rilevano trend significativo
+os1,LIN1_VmData,0.807648,0.000000,SÌ,0.031572,"[0.030716, 0.032321]",SÌ,✓ COERENTI,Entrambi rilevano trend significativo
+os1,LIN1_RSS,0.682682,0.000000,SÌ,0.004971,"[0.004877, 0.005056]",SÌ,✓ COERENTI,Entrambi rilevano trend significativo
+os1,LIN1_byte_letti_I_O,0.082308,0.000000,SÌ,4.737578,"[3.673916, 5.804599]",SÌ,✓ COERENTI,Entrambi rilevano trend significativo
+os1,LIN1_byte_letti_I_O1,-0.001734,0.855476,NO,-0.030814,"[-0.360880, 0.298425]",NO,✓ COERENTI,Entrambi indicano trend non significativo
+os2,LIN2_VmSize,0.706482,0.000000,SÌ,0.001913,"[0.000000, 0.002085]",NO,⚠️  BORDERLINE,MK significativo ma TS intervallo include 0
+os2,LIN2_VmData,0.706482,0.000000,SÌ,0.001913,"[0.000000, 0.002085]",NO,⚠️  BORDERLINE,MK significativo ma TS intervallo include 0
+os2,LIN2_RSS,0.178778,0.000000,SÌ,0.000632,"[0.000556, 0.000745]",SÌ,✓ COERENTI,Entrambi rilevano trend significativo
+os2,LIN2_byte_letti__sec,0.625946,0.000000,SÌ,114.553510,"[112.733593, 116.376598]",SÌ,✓ COERENTI,Entrambi rilevano trend significativo
+os2,LIN2_byte_scritti__sec,-0.021029,0.034197,SÌ,-0.488613,"[-0.939001, -0.036319]",SÌ,✓ COERENTI,Entrambi rilevano trend significativo
+os3,LIN4_VmSize,0.783224,0.000000,SÌ,0.021659,"[0.021274, 0.022026]",SÌ,✓ COERENTI,Entrambi rilevano trend significativo
+os3,LIN4_VmData,0.783224,0.000000,SÌ,0.021659,"[0.021274, 0.022026]",SÌ,✓ COERENTI,Entrambi rilevano trend significativo
+os3,LIN4RSS,0.593819,0.000000,SÌ,0.003458,"[0.003388, 0.003522]",SÌ,✓ COERENTI,Entrambi rilevano trend significativo
+os3,LIN4_byte_letti__sec,-0.050557,0.000000,SÌ,-1.891049,"[-2.617642, -1.167760]",SÌ,✓ COERENTI,Entrambi rilevano trend significativo
+os3,LIN4_byte_scritti__sec,-0.017098,0.084120,NO,-0.562464,"[-1.197505, 0.075960]",NO,✓ COERENTI,Entrambi indicano trend non significativo

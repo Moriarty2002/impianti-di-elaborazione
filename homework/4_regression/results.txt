@@ -1,5 +1,6 @@
 REGRESSIONE
 
+****************************************************************** EXP ************************************
 ******** EXP1 *********
 Seguiti step del file readme, nel test della normalità dati, visivamente si vede che non lo sono e
 	inoltre test Shapiro-Wilk W (bontà di adattamento, goodness of fit) ci dà p-value << 0.05 
@@ -18,3 +19,38 @@ Valutato se esiste trend con test di Man-Kendall: lo hanno tutti, ma nmail ha p-
 
 Calcolo slope con theil-san, solo nmail ha 0 nell'intervallo, quindi è come se ci fosse un trend decrescente molto basso dato
 	il risultato del test di Mann-Kendall
+
+
+****************************************************************** OS ************************************
+******** OS1 *********
+Seguiti step del file readme, nel test della normalità dati, visivamente si vede che non lo sono e
+	inoltre test Shapiro-Wilk W (bontà di adattamento, goodness of fit) ci dà p-value << 0.05 
+
+Valutato se esiste trend con test di Man-Kendall:
+
+
+Calcolo slope con theil-san
+
+
+TUTTO ANALOGO IN OS1, OS2, OS3 a quanto visto in EXP
+
+
+Risultati confronto:
+
+2 casi borderline (os2): LIN2_VmData, LIN2_VmSize
+Mann-Kendall rileva un trend monotono (Kendall Tau = 0.706, molto forte!)
+Theil-Sen conferma il trend positivo ma l'intervallo tocca lo zero come limite inferiore
+
+VmSize e VmData: os1 > os3 > os2 (os1 ha il trend crescente più marcato)
+RSS: os1 > os3 > os2 (tutti crescenti, os1 il più marcato)
+byte_letti: os2 ha il trend più alto (114.55 byte/sec!) mentre os3 ha trend decrescente
+byte_scritti: os2 e os3 hanno trend decrescenti, os1 non presente
+
+
+
+****************************************************************** VMRES ************************************
+
+
+
+
+

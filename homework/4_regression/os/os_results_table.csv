@@ -1,0 +1,16 @@
+Sheet,Metric,Slope,Interval_Low,Interval_Up,Intercept,Trend
+os1,LIN1_VmSize,0.031572,0.030716,0.032321,738854.39,↗ Crescente
+os1,LIN1_VmData,0.031572,0.030716,0.032321,670450.39,↗ Crescente
+os1,LIN1_RSS,0.004971,0.004877,0.005056,42428.81,↗ Crescente
+os1,LIN1_byte_letti_I_O,4.737578,3.673916,5.804599,102763229.50,↗ Crescente
+os1,LIN1_byte_letti_I_O1,-0.030814,-0.360880,0.298425,34500875.47,⚠️ Non significativo
+os2,LIN2_VmSize,0.001913,0.000000,0.002085,735790.38,⚠️ Non significativo
+os2,LIN2_VmData,0.001913,0.000000,0.002085,667414.38,⚠️ Non significativo
+os2,LIN2_RSS,0.000632,0.000556,0.000745,42384.85,↗ Crescente
+os2,LIN2_byte_letti__sec,114.553510,112.733593,116.376598,77733384.24,↗ Crescente
+os2,LIN2_byte_scritti__sec,-0.488613,-0.939001,-0.036319,65693615.58,↘ Decrescente
+os3,LIN4_VmSize,0.021659,0.021274,0.022026,744374.60,↗ Crescente
+os3,LIN4_VmData,0.021659,0.021274,0.022026,675970.60,↗ Crescente
+os3,LIN4RSS,0.003458,0.003388,0.003522,45386.47,↗ Crescente
+os3,LIN4_byte_letti__sec,-1.891049,-2.617642,-1.167760,141291080.77,↘ Decrescente
+os3,LIN4_byte_scritti__sec,-0.562464,-1.197505,0.075960,130813214.83,⚠️ Non significativo
