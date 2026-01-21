@@ -1,0 +1,22 @@
+----- HL -----
+
+Prima riga skippata
+
+Colonne rimosse:
+	Timestamp, responseCode, responseMessage, dataType, success, failureMessage, grpThreads, URL, idleTime
+
+Colonne non utilizzate:
+	label, threadName
+
+Colonne usate:
+	elapsed, bytes, sentBytes, allThreads, Latency, Connect
+
+
+PCA usate: 5
+Cluster usati: 9
+
+
+----- LL -----
+
+Colonne rimosse:
+	b, swpd, si, so, wa, st, gu
