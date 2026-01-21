@@ -68,20 +68,78 @@ def plot_grouped_summary(grouped_df, output_prefix="summary_plot"):
     # Sort by prefix
     grouped_df = grouped_df.sort_values("prefix")
     
-    # Get x for knee capacity
+    # Calculate knee capacity (max power)
+    # Knee Capacity = massimo valore della metrica di Power
     max_power_index = grouped_df["power"].idxmax()
-    x_for_max_power = grouped_df.loc[max_power_index, "prefix"]
+    knee_capacity = grouped_df.loc[max_power_index, "prefix"]
+    max_power_value = grouped_df.loc[max_power_index, "power"]
+    knee_throughput = grouped_df.loc[max_power_index, "throughput"]
+    knee_response_time = grouped_df.loc[max_power_index, "avg_response_time_ms"]
+    
+    # Calculate usable capacity
+    # Capacità Utilizzabile = punto dopo il quale la power comincia drasticamente a decrescere
+    # Cerchiamo il punto dopo la knee capacity dove la power è ancora accettabile
+    # (almeno 10% del valore massimo)
+    points_after_knee = grouped_df[grouped_df["prefix"] > knee_capacity].copy()
+    
+    if len(points_after_knee) > 0:
+        # Trova il punto dove la power scende sotto il 10% del massimo
+        threshold = max_power_value * 0.10
+        below_threshold = points_after_knee[points_after_knee["power"] < threshold]
+        
+        if len(below_threshold) > 0:
+            # Prendi il punto appena prima che scenda sotto la soglia
+            usable_idx = below_threshold.index[0]
+            # Trova l'indice precedente nel dataframe originale
+            original_indices = grouped_df.index.tolist()
+            pos = original_indices.index(usable_idx)
+            if pos > 0:
+                usable_idx = original_indices[pos - 1]
+        else:
+            # Se tutti i punti dopo knee sono sopra la soglia, prendi l'ultimo
+            usable_idx = points_after_knee.index[-1]
+        
+        usable_capacity_actual = grouped_df.loc[usable_idx, "prefix"]
+        usable_throughput = grouped_df.loc[usable_idx, "throughput"]
+        usable_response_time = grouped_df.loc[usable_idx, "avg_response_time_ms"]
+        usable_power = grouped_df.loc[usable_idx, "power"]
+    else:
+        # Se non ci sono punti dopo knee, usa knee stesso
+        usable_capacity_actual = knee_capacity
+        usable_throughput = knee_throughput
+        usable_response_time = knee_response_time
+        usable_power = max_power_value
+    
+    print("\n" + "="*60)
+    print("CAPACITY ANALYSIS RESULTS")
+    print("="*60)
+    print(f"\nKnee Capacity (Maximum Power):")
+    print(f"  - Definizione: Massimo valore della metrica di Power")
+    print(f"  - CTT: {knee_capacity:.0f}")
+    print(f"  - Power: {max_power_value:.4f}")
+    print(f"  - Throughput: {knee_throughput:.2f} req/s")
+    print(f"  - Avg Response Time: {knee_response_time:.2f} ms")
+    print(f"\nCapacità Utilizzabile:")
+    print(f"  - Definizione: Punto dopo il quale la power")
+    print(f"    comincia drasticamente a decrescere")
+    print(f"  - CTT: {usable_capacity_actual:.0f}")
+    print(f"  - Power: {usable_power:.4f}")
+    print(f"  - Throughput: {usable_throughput:.2f} req/s")
+    print(f"  - Avg Response Time: {usable_response_time:.2f} ms")
+    print("="*60 + "\n")
 
     # --- Plot Average Response Time ---
-    plot_metrics(grouped_df, "avg_response_time_ms", plot_dir, f"{output_prefix}_avg_response_time", "CTT", "Avg [ms]", "Response Time", axvline_x=x_for_max_power)
+    plot_metrics(grouped_df, "avg_response_time_ms", plot_dir, f"{output_prefix}_avg_response_time", "CTT", "Avg [ms]", "Response Time", axvline_x=knee_capacity, axvline_x2=usable_capacity_actual)
 
     # --- Plot Throughput ---
-    plot_metrics(grouped_df, "throughput", plot_dir, f"{output_prefix}_throughput", "CTT", "Avg", "Throughput", axvline_x=x_for_max_power)
+    plot_metrics(grouped_df, "throughput", plot_dir, f"{output_prefix}_throughput", "CTT", "Avg", "Throughput", axvline_x=knee_capacity, axvline_x2=usable_capacity_actual)
 
     # --- Plot Power ---
-    plot_metrics(grouped_df, "power", plot_dir, f"{output_prefix}_power", "CTT", "Avg", "Power", axvline_x=x_for_max_power)
+    plot_metrics(grouped_df, "power", plot_dir, f"{output_prefix}_power", "CTT", "Avg", "Power", axvline_x=knee_capacity, axvline_x2=usable_capacity_actual)
 
-    print(f"✅ Line plots saved as {output_prefix}_avg_response_time.png and {output_prefix}_throughput.png")
+    print(f"✅ Line plots saved in {plot_dir}/")
+    
+    return knee_capacity, usable_capacity_actual
 
 
 if __name__ == "__main__":
@@ -90,19 +148,22 @@ if __name__ == "__main__":
     jmeter_dir = os.path.join(script_dir, "jmeter")
     
     csv_files = glob.glob(os.path.join(jmeter_dir, "*.csv"))
-    # print(csv_files)
+    print(f"Found {len(csv_files)} CSV files in jmeter directory")
 
     results = []
     for file in csv_files:
         metrics = process_csv(file)
         results.append(metrics)
 
-    # Save results into a summary CSV
+    # Save results into a summary CSV in the script directory
+    summary_path = os.path.join(script_dir, "summary_results.csv")
     results_df = pd.DataFrame(results)
-    results_df.to_csv("homework/capacity_test/summary_results.csv", index=False)
+    results_df.to_csv(summary_path, index=False)
 
-    print("Summary written to summary_results.csv")
+    print(f"✅ Summary written to {summary_path}")
     
-    to_plot = process_summary(os.path.join(script_dir, "summary_results.csv"))
+    # Process summary and group by CTT values (averaging the 3 repetitions)
+    to_plot = process_summary(summary_path)
     
-    plot_grouped_summary(to_plot)
+    # Plot and calculate capacities
+    knee_capacity, usable_capacity = plot_grouped_summary(to_plot)
