@@ -44,7 +44,7 @@ def process_summary_avg(summary_file):
     return grouped
 
 
-def compute_fairness_index(avg_grouped_csv):
+def compute_fairness_index(avg_grouped_csv, output_file):
     df = pd.read_csv(avg_grouped_csv)
 
     # normalized throughput
@@ -56,6 +56,18 @@ def compute_fairness_index(avg_grouped_csv):
     fairness = numerator / denominator
 
     print(f"Throughput: {df['throughput'].values} \nFair troughput: {df['nominal_troughput'].values} \nNormalized throughput: {normalized_throughput.values} \nFairness Index: {fairness:.4f}")
+    
+    # Save fairness index to file
+    result_df = pd.DataFrame({
+        "throughput": df["throughput"].values,
+        "nominal_throughput": df["nominal_troughput"].values,
+        "normalized_throughput": normalized_throughput.values
+    })
+    result_df.loc[len(result_df)] = ["", "", ""]
+    result_df.loc[len(result_df)] = ["Fairness Index", fairness, ""]
+    result_df.to_csv(output_file, index=False)
+    print(f"\nFairness index saved to: {output_file}")
+    
     return fairness
 
 
@@ -71,9 +83,10 @@ if __name__ == "__main__":
         results.append(metrics)
 
     results_df = pd.DataFrame(results)
-    results_df.to_csv("homework/fairness_index/avg.csv", index=False)
+    results_df.to_csv(os.path.join(script_dir, "avg.csv"), index=False)
     
     process_summary_avg(os.path.join(script_dir, "avg.csv"))
     
-    compute_fairness_index(os.path.join(script_dir, "avg_grouped.csv"))
+    fairness_output = os.path.join(script_dir, "fairness_index_result.csv")
+    compute_fairness_index(os.path.join(script_dir, "avg_grouped.csv"), fairness_output)
     
