@@ -20,7 +20,7 @@ def process_csv(file_path):
     
     throughput = total_ok / duration
     
-    power = throughput / avg_response_time
+    power = throughput / (avg_response_time / 1000)
 
     return {
         "file": os.path.basename(file_path),
@@ -132,10 +132,10 @@ def plot_grouped_summary(grouped_df, output_prefix="summary_plot"):
     plot_metrics(grouped_df, "avg_response_time_ms", plot_dir, f"{output_prefix}_avg_response_time", "CTT", "Avg [ms]", "Response Time", axvline_x=knee_capacity, axvline_x2=usable_capacity_actual)
 
     # --- Plot Throughput ---
-    plot_metrics(grouped_df, "throughput", plot_dir, f"{output_prefix}_throughput", "CTT", "Avg", "Throughput", axvline_x=knee_capacity, axvline_x2=usable_capacity_actual)
+    plot_metrics(grouped_df, "throughput", plot_dir, f"{output_prefix}_throughput", "CTT", "Avg [req/s]", "Throughput", axvline_x=knee_capacity, axvline_x2=usable_capacity_actual)
 
     # --- Plot Power ---
-    plot_metrics(grouped_df, "power", plot_dir, f"{output_prefix}_power", "CTT", "Avg", "Power", axvline_x=knee_capacity, axvline_x2=usable_capacity_actual)
+    plot_metrics(grouped_df, "power", plot_dir, f"{output_prefix}_power", "CTT", "Avg [req/s²]", "Power", axvline_x=knee_capacity, axvline_x2=usable_capacity_actual)
 
     print(f"✅ Line plots saved in {plot_dir}/")
     
